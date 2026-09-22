@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	// TEMPORIZADOR GERAL INICIA AQUI
+
 	start := time.Now()
 
 	log := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -43,8 +43,7 @@ func main() {
 		log.Error("import process failed", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-
-	// TEMPORIZADOR GERAL FINALIZA AQUI
+	
 	log.Info("========================================")
 	log.Info("🚀 IMPORT SUCCESSFULLY COMPLETED!")
 	log.Info("⏱️ TOTAL DURATION", slog.String("total_time", time.Since(start).String()))
