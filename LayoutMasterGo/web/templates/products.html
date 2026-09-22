@@ -1,0 +1,94 @@
+<div x-data="productsComponent()" x-init="init()">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Gerenciamento de Produtos</h2>
+            <small class="text-muted">Catálogo e controle de inventário</small>
+        </div>
+        
+        <!-- BUSCA EM TEMPO REAL NO BANCO DE DADOS -->
+        <div class="d-flex gap-2" style="width: 450px;">
+            <input type="text" 
+                   x-model="searchQuery" 
+                   @input.debounce.300ms="onSearch()" 
+                   class="form-control" 
+                   placeholder="Buscar por JanCode ou Nome...">
+            <button class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#modalProduct">
+                <i class="bi bi-plus-lg me-1"></i> Novo Produto
+            </button>
+        </div>
+    </div>
+
+    <!-- TABELA EXIBINDO APENAS JANCODE E NOME -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>JanCode</th>
+                            <th>Nome do Produto</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="item in products" :key="item.ID || item.id">
+                            <tr>
+                                <td><code x-text="item.jan_code || item.JanCode"></code></td>
+                                <td x-text="item.name || item.Name"></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-danger" @click="deleteProduct(item.ID || item.id)">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        
+                        <template x-if="products.length === 0 && !loading">
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <span x-show="!searchQuery.trim()">Nenhum produto cadastrado.</span>
+                                    <span x-show="searchQuery.trim()">Nenhum produto encontrado para a busca.</span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- PAGINAÇÃO INTEGRADA -->
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="text-muted small">Página <strong x-text="page"></strong></span>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary btn-sm" @click="changePage(-1)" :disabled="page === 1">Anterior</button>
+                <button class="btn btn-outline-secondary btn-sm" @click="changePage(1)" :disabled="products.length < pageSize">Próxima</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CADASTRO -->
+    <div class="modal fade" id="modalProduct" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" @submit.prevent="createProduct()">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">JanCode</label>
+                        <input type="text" x-model="newProduct.jan_code" class="form-control" required placeholder="Ex: 4901234567890">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Produto</label>
+                        <input type="text" x-model="newProduct.name" class="form-control" required placeholder="Ex: Detergente Líquido">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

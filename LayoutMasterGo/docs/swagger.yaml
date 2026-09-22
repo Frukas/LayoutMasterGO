@@ -1,0 +1,553 @@
+basePath: /api/v1
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_controller.AddProductRequest:
+    properties:
+      product_id:
+        example: 1
+        type: integer
+      quantity:
+        example: 10
+        type: integer
+    type: object
+  internal_controller.UpdateQuantityRequest:
+    properties:
+      quantity:
+        example: 15
+        type: integer
+    type: object
+  layoutmastergo_internal_models.Container:
+    properties:
+      createdAt:
+        type: string
+      data:
+        example: "2026-09-09T10:00:00Z"
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/layoutmastergo_internal_models.ItemContainer'
+        type: array
+      name:
+        example: Lote A-100
+        type: string
+      status:
+        example: Em trânsito
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - data
+    - name
+    type: object
+  layoutmastergo_internal_models.ItemContainer:
+    properties:
+      container:
+        $ref: '#/definitions/layoutmastergo_internal_models.Container'
+      container_id:
+        example: 10
+        type: integer
+      product:
+        $ref: '#/definitions/layoutmastergo_internal_models.Product'
+      product_id:
+        example: 1
+        type: integer
+      quantity:
+        example: 50
+        type: integer
+    required:
+    - quantity
+    type: object
+  layoutmastergo_internal_models.Product:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/layoutmastergo_internal_models.ItemContainer'
+        type: array
+      jan_code:
+        example: "4901234567890"
+        type: string
+      name:
+        example: Detergente Líquido
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - jan_code
+    - name
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: suporte@layoutmaster.com
+    name: Suporte técnico
+  description: API RESTful para gerenciamento de contêineres e produtos desenvolvida
+    com Gin, GORM e Clean Architecture.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Layout Master Go API
+  version: "1.0"
+paths:
+  /containers:
+    get:
+      description: Retorna uma lista paginada de contêineres cadastrados
+      parameters:
+      - description: 'Número da página (padrão: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Quantidade de itens por página (padrão: 10)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/layoutmastergo_internal_models.Container'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar contêineres
+      tags:
+      - Containers
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo contêiner na base de dados
+      parameters:
+      - description: Dados do contêiner
+        in: body
+        name: container
+        required: true
+        schema:
+          $ref: '#/definitions/layoutmastergo_internal_models.Container'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Container'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar novo contêiner
+      tags:
+      - Containers
+  /containers/{id}:
+    delete:
+      description: Remove um contêiner da base de dados pelo seu ID
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Excluir contêiner
+      tags:
+      - Containers
+    get:
+      description: Retorna os detalhes de um contêiner específico
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Container'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obter contêiner por ID
+      tags:
+      - Containers
+    put:
+      consumes:
+      - application/json
+      description: Atualiza as informações de um contêiner existente pelo ID
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload do contêiner com alterações
+        in: body
+        name: container
+        required: true
+        schema:
+          $ref: '#/definitions/layoutmastergo_internal_models.Container'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Container'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar contêiner
+      tags:
+      - Containers
+  /containers/{id}/items:
+    post:
+      consumes:
+      - application/json
+      description: Associa um produto com uma determinada quantidade dentro do contêiner
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do item a ser adicionado
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controller.AddProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Adicionar produto ao contêiner
+      tags:
+      - Containers
+  /containers/{id}/items/{product_id}:
+    delete:
+      description: Desassocia um produto de um contêiner pelo ID de ambos
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID do Produto
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remover produto do contêiner
+      tags:
+      - Containers
+    put:
+      consumes:
+      - application/json
+      description: Modifica a quantidade de um produto previamente associado a um
+        contêiner
+      parameters:
+      - description: ID do Contêiner
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID do Produto
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      - description: Nova quantidade
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controller.UpdateQuantityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar quantidade do produto no contêiner
+      tags:
+      - Containers
+  /products:
+    get:
+      description: Retorna uma lista paginada de produtos cadastrados
+      parameters:
+      - description: 'Número da página (padrão: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Quantidade de itens por página (padrão: 10)'
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/layoutmastergo_internal_models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar produtos
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo produto na base de dados
+      parameters:
+      - description: Dados do produto
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/layoutmastergo_internal_models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar novo produto
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      description: Remove um produto da base de dados pelo seu ID
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Excluir produto
+      tags:
+      - Products
+    get:
+      description: Retorna os detalhes de um produto específico pelo seu ID
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obter produto por ID
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Atualiza as informações de um produto existente pelo ID
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload do produto com alterações
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/layoutmastergo_internal_models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/layoutmastergo_internal_models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar produto
+      tags:
+      - Products
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Digite "Bearer " seguido do seu token JWT
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

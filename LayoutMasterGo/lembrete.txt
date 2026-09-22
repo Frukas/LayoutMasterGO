@@ -1,0 +1,3 @@
+O status dos container e suas regras de negocio ainda não estão implemnentadas. 
+É necessário verificar com mais cuidado as regras de negocios e 
+refletir na camada de serviço: internal/service.
