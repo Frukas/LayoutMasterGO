@@ -305,8 +305,8 @@ The batch importer (`cmd/importer` and `internal/importer`) is tailored for matr
 ```text
        Col A         Col B      ...    Col N       Col O       Col P
 Row 6: JAN Code   | Product Name | ... | Cont. 1 | Cont. 2 | Cont. 3 ...
-Row 7: 4901234567 | Product A    | ... | 50      | 12      | -
-Row 8: 4901234568 | Product B    | ... | 100     | -       | 45
+Row 7: 4999999999 | Product A    | ... | 50      | 12      | -
+Row 8: 4888885555 | Product B    | ... | 100     | -       | 45
 ```
 
 ### Pipeline Flow:
